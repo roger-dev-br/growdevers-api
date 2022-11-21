@@ -1,2 +1,2 @@
-# api-growdevers-7ed-starter
+# growdevers-api
 API de Growdevers
