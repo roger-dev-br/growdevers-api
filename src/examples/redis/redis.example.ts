@@ -1,12 +1,15 @@
 import Redis from "ioredis";
+import "dotenv/config";
+
 import { Growdever } from "../../app/models/growdever.model";
+import { redisEnv } from "../../app/envs/redis.env";
 
 export async function exampleRedis() {
     const redis = new Redis({
-        host: "redis-19984.c93.us-east-1-3.ec2.cloud.redislabs.com",
-        port: 19984,
-        username: "default",
-        password: "cF7EMnEEHa48foM50XPUMTewoNIV018R",
+        host: redisEnv.host,
+        port: redisEnv.port,
+        username: redisEnv.username,
+        password: redisEnv.password,
     });
 
     // Faz o get e já imprime no console
