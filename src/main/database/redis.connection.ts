@@ -13,6 +13,8 @@ export class RedisConnection {
                 password: redisEnv.password,
             });
         }
+
+        console.log("Redis is connected.");
     }
 
     public static get connection() {
