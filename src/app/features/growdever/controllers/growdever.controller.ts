@@ -4,11 +4,14 @@ import { GetGrowdeverUseCase } from "./../usecases/get-growdever.usecase";
 import { Request, Response } from "express";
 import { GrowdeverRepository } from "../repositories/growdever.repository";
 import { ListGrowdeversUseCase } from "../usecases/list-growdevers.usecase";
+import { HttpHelper } from "../../../shared/util/http.helper";
 
 export class GrowdeverController {
-    public async list(req: Request, res: Response) {
+    public async list(_: Request, res: Response) {
         try {
-            const usecase = new ListGrowdeversUseCase(new GrowdeverRepository());
+            const usecase = new ListGrowdeversUseCase(
+                new GrowdeverRepository()
+            );
             const result = await usecase.execute();
 
             return res.status(200).send({
@@ -17,10 +20,7 @@ export class GrowdeverController {
                 data: result,
             });
         } catch (error: any) {
-            return res.status(500).send({
-                ok: false,
-                message: error.toString(),
-            });
+            return HttpHelper.serverError(res, error);
         }
     }
 
@@ -44,10 +44,7 @@ export class GrowdeverController {
                 data: result,
             });
         } catch (error: any) {
-            return res.status(500).send({
-                ok: false,
-                message: error.toString(),
-            });
+            return HttpHelper.serverError(res, error);
         }
     }
 
@@ -55,51 +52,9 @@ export class GrowdeverController {
         try {
             const { nome, cpf, idade, skills, endereco } = req.body;
 
-            if (!nome) {
-                return res.status(400).send({
-                    ok: false,
-                    message: "Nome not provided",
-                });
-            }
-
-            if (!idade) {
-                return res.status(400).send({
-                    ok: false,
-                    message: "Idade not provided",
-                });
-            }
-
-            if (!cpf) {
-                return res.status(400).send({
-                    ok: false,
-                    message: "CPF not provided",
-                });
-            }
-
-            if (endereco) {
-                if (!endereco.rua) {
-                    return res.status(400).send({
-                        ok: false,
-                        message: "endereco.rua not provided",
-                    });
-                }
-
-                if (!endereco.cidade) {
-                    return res.status(400).send({
-                        ok: false,
-                        message: "endereco.cidade not provided",
-                    });
-                }
-
-                if (!endereco.uf) {
-                    return res.status(400).send({
-                        ok: false,
-                        message: "endereco.uf not provided",
-                    });
-                }
-            }
-
-            const usecase = new CreateGrowdeverUseCase(new GrowdeverRepository());
+            const usecase = new CreateGrowdeverUseCase(
+                new GrowdeverRepository()
+            );
             const result = await usecase.execute({
                 nome,
                 cpf,
@@ -108,16 +63,14 @@ export class GrowdeverController {
                 endereco,
             });
 
-            return res.status(201).send({
-                ok: true,
-                message: "Growdever successfully created",
-                data: result,
-            });
+            return HttpHelper.success(
+                res,
+                result,
+                "Growdever successfully created",
+                201
+            );
         } catch (error: any) {
-            return res.status(500).send({
-                ok: false,
-                message: error.toString(),
-            });
+            return HttpHelper.serverError(res, error);
         }
     }
 
@@ -126,32 +79,22 @@ export class GrowdeverController {
             const { id } = req.params;
             const { nome, idade } = req.body;
 
-            // Verificar se os dados foram informados
-
-            const usecase = new UpdateGrowdeverUseCase(new GrowdeverRepository());
+            const usecase = new UpdateGrowdeverUseCase(
+                new GrowdeverRepository()
+            );
             const result = await usecase.execute({ id, nome, idade });
 
             if (!result) {
-                return res.status(404).send({
-                    ok: false,
-                    message: "Ng aruá!",
-                });
+                return HttpHelper.notFoundError(res, "Growdever");
             }
 
-            return res.status(200).send({
-                ok: true,
-                message: "Growdever atualizado com sucesso",
-                data: result,
-            });
+            return HttpHelper.success(
+                res,
+                result,
+                "Growdever atualizado com sucesso"
+            );
         } catch (error: any) {
-            return res.status(500).send({
-                ok: false,
-                message: error.toString(),
-            });
+            return HttpHelper.serverError(res, error);
         }
     }
-
-    // to-do:
-    //  - delete
-    //  - refatorar getByCpf
 }

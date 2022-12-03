@@ -12,7 +12,8 @@ interface UpdateGrowdeverDTO {
 }
 
 export class GrowdeverRepository {
-    private _repository = DatabaseConnection.connection.getRepository(GrowdeverEntity);
+    private _repository =
+        DatabaseConnection.connection.getRepository(GrowdeverEntity);
 
     public async list() {
         const result = await this._repository.find({
@@ -92,7 +93,7 @@ export class GrowdeverRepository {
         return this.mapEntityToModel(result);
     }
 
-    private mapEntityToModel(growdever: GrowdeverEntity) {
+    public mapEntityToModel(growdever: GrowdeverEntity) {
         let endereco = undefined;
 
         if (growdever.endereco) {

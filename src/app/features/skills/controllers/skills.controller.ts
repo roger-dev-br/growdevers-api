@@ -49,39 +49,4 @@ export class SkillsController {
             });
         }
     }
-
-    // public removeSkill(req: Request, res: Response) {
-    //     try {
-    //         const { id, skill } = req.params;
-
-    //         const growdever = growdeversList.find((growdever) => growdever.id === id);
-
-    //         if (!growdever) {
-    //             return res.status(404).send({
-    //                 ok: false,
-    //                 message: "growdever not found",
-    //             });
-    //         }
-
-    //         const skillIndex = growdever.skills.findIndex((item: any) => item === skill);
-
-    //         if (skillIndex < 0) {
-    //             return res.status(404).send({
-    //                 ok: false,
-    //                 message: "skill not found",
-    //             });
-    //         }
-
-    //         growdever.skills.splice(skillIndex, 1);
-
-    //         return res.send({
-    //             ok: true,
-    //         });
-    //     } catch (error: any) {
-    //         return res.status(500).send({
-    //             ok: false,
-    //             message: error.toString(),
-    //         });
-    //     }
-    // }
 }
