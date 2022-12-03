@@ -5,12 +5,14 @@ import { Request, Response } from "express";
 import { GrowdeverRepository } from "../repositories/growdever.repository";
 import { ListGrowdeversUseCase } from "../usecases/list-growdevers.usecase";
 import { HttpHelper } from "../../../shared/util/http.helper";
+import { CacheRepository } from "../../../shared/database/repositories/cache.repository";
 
 export class GrowdeverController {
     public async list(_: Request, res: Response) {
         try {
             const usecase = new ListGrowdeversUseCase(
-                new GrowdeverRepository()
+                new GrowdeverRepository(),
+                new CacheRepository()
             );
             const result = await usecase.execute();
 
