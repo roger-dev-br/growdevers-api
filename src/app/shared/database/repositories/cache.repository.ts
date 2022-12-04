@@ -26,7 +26,7 @@ export class CacheRepository {
      * @param key chave a ser buscada na database
      * @returns o valor encontrado ou null; caso exista valor, retorna com JSON.parse
      */
-    public async get(key: string) {
+    public async get<T>(key: string): Promise<T | null> {
         const result = await this.redis.get(key);
 
         if (!result) {

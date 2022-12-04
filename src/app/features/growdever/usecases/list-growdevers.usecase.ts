@@ -1,3 +1,4 @@
+import { Growdever } from "../../../models/growdever.model";
 import { CacheRepository } from "../../../shared/database/repositories/cache.repository";
 import { GrowdeverRepository } from "../repositories/growdever.repository";
 

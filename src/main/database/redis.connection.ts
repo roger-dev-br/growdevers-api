@@ -19,7 +19,7 @@ export class RedisConnection {
 
     public static get connection() {
         if (!this._connection) {
-            throw new Error("Redis is not connected");
+            throw new Error("Redis is not connected.");
         }
 
         return this._connection;
