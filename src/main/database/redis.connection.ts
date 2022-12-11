@@ -24,4 +24,12 @@ export class RedisConnection {
 
         return this._connection;
     }
+
+    public static destroy() {
+        if (!this._connection) {
+            throw new Error("Redis is not connected.");
+        }
+
+        this._connection.disconnect();
+    }
 }

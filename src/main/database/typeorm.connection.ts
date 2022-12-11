@@ -21,4 +21,12 @@ export class DatabaseConnection {
 
         return this._connection;
     }
+
+    public static async destroy() {
+        if (!this._connection) {
+            throw new Error("A database não tá inicializada, aruá");
+        }
+
+        await this._connection.destroy();
+    }
 }

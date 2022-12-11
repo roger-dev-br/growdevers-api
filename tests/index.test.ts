@@ -20,6 +20,11 @@ describe("Testes básicos", () => {
         await RedisConnection.connect();
     });
 
+    afterAll(async () => {
+        await DatabaseConnection.destroy();
+        RedisConnection.destroy();
+    });
+
     test("should test coverage", async () => {
         const sut = new ListGrowdeversUseCase(
             new GrowdeverRepository(),
