@@ -4,6 +4,7 @@ import {
 } from "../../../../src/main/database";
 import { GetGrowdeverUseCase } from "../../../../src/app/features/growdever/usecases/get-growdever.usecase";
 import { GrowdeverRepository } from "../../../../src/app/features/growdever/repositories/growdever.repository";
+import { Growdever } from "../../../../src/app/models/growdever.model";
 
 describe("Get growdever usecase tests", () => {
     beforeAll(async () => {
@@ -12,8 +13,9 @@ describe("Get growdever usecase tests", () => {
     });
 
     afterAll(async () => {
-        await DatabaseConnection.destroy();
         RedisConnection.destroy();
+        await DatabaseConnection.destroy();
+        return;
     });
 
     const makeSut = () => {
@@ -22,6 +24,10 @@ describe("Get growdever usecase tests", () => {
     };
 
     test("should return null if growdever does not exist", async () => {
+        jest.spyOn(GrowdeverRepository.prototype, "get").mockResolvedValueOnce(
+            null
+        );
+
         const sut = makeSut();
         const result = await sut.execute("invalid-id");
 
@@ -29,14 +35,18 @@ describe("Get growdever usecase tests", () => {
     });
 
     test("should return a valid json data if growdever exists", async () => {
-        const sut = makeSut();
-        const result = await sut.execute(
-            "157205d4-b14e-49b5-842d-02261ddead18"
+        const grow = new Growdever("abc", 123, 12, []);
+
+        jest.spyOn(GrowdeverRepository.prototype, "get").mockResolvedValueOnce(
+            grow
         );
+
+        const sut = makeSut();
+        const result = await sut.execute("valid-id");
 
         expect(result).not.toBeNull();
         expect(result).toHaveProperty("id");
         expect(result).toHaveProperty("cpf");
-        expect(result!.id).toEqual("157205d4-b14e-49b5-842d-02261ddead18");
+        expect(result!.id).toEqual(grow.id);
     });
 });

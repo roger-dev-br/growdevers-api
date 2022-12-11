@@ -21,11 +21,17 @@ describe("Testes básicos", () => {
     });
 
     afterAll(async () => {
-        await DatabaseConnection.destroy();
         RedisConnection.destroy();
+        return await DatabaseConnection.destroy();
+    });
+
+    beforeEach(() => {
+        jest.resetAllMocks();
     });
 
     test("should test coverage", async () => {
+        jest.setTimeout(50000);
+
         const sut = new ListGrowdeversUseCase(
             new GrowdeverRepository(),
             new CacheRepository()

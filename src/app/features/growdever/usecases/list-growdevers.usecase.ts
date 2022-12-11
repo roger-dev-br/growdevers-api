@@ -17,12 +17,12 @@ export class ListGrowdeversUseCase {
 
     public async execute(): Promise<any[]> {
         // 1 - Busca a lista no cache (Redis)
-        const cached = await this.cacheRepository.get(this.cacheKey);
+        // const cached = await this.cacheRepository.get(this.cacheKey);
 
-        // Se há cache, retorna o valor que foi salvo
-        if (cached) {
-            return cached as any[];
-        }
+        // // Se há cache, retorna o valor que foi salvo
+        // if (cached) {
+        //     return cached as any[];
+        // }
 
         // 2 - Se não há cache, vai até o repo do Postgres
         const growdevers = await this.repository.list();
@@ -30,7 +30,7 @@ export class ListGrowdeversUseCase {
 
         // 3 - Salva o resultado em cache para não precisar
         // consultar o Postgres novamente
-        await this.cacheRepository.set(this.cacheKey, result);
+        // await this.cacheRepository.set(this.cacheKey, result);
 
         return result;
     }

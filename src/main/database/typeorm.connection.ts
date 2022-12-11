@@ -27,6 +27,10 @@ export class DatabaseConnection {
             throw new Error("A database não tá inicializada, aruá");
         }
 
+        console.log("destruindo a conexão");
+
         await this._connection.destroy();
+
+        console.log("conexão destruída");
     }
 }
