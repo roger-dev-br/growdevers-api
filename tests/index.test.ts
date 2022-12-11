@@ -1,3 +1,8 @@
+import { GrowdeverRepository } from "../src/app/features/growdever/repositories/growdever.repository";
+import { ListGrowdeversUseCase } from "../src/app/features/growdever/usecases/list-growdevers.usecase";
+import { CacheRepository } from "../src/app/shared/database/repositories/cache.repository";
+import { DatabaseConnection, RedisConnection } from "../src/main/database";
+
 describe("Testes básicos", () => {
     // test('should <...> if/when <...>', () => {
     //    ...
@@ -8,5 +13,21 @@ describe("Testes básicos", () => {
         console.log("O resultado foi " + result);
 
         expect(result).toBe(2);
+    });
+
+    beforeAll(async () => {
+        await DatabaseConnection.connect();
+        await RedisConnection.connect();
+    });
+
+    test("should test coverage", async () => {
+        const sut = new ListGrowdeversUseCase(
+            new GrowdeverRepository(),
+            new CacheRepository()
+        );
+        const result = await sut.execute();
+
+        expect(result).toBeDefined();
+        expect(result.length).toBeGreaterThan(1);
     });
 });

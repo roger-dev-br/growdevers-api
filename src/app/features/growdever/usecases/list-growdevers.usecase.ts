@@ -15,13 +15,13 @@ export class ListGrowdeversUseCase {
         private cacheRepository: CacheRepository
     ) {}
 
-    public async execute() {
+    public async execute(): Promise<any[]> {
         // 1 - Busca a lista no cache (Redis)
         const cached = await this.cacheRepository.get(this.cacheKey);
 
         // Se há cache, retorna o valor que foi salvo
         if (cached) {
-            return cached;
+            return cached as any[];
         }
 
         // 2 - Se não há cache, vai até o repo do Postgres
