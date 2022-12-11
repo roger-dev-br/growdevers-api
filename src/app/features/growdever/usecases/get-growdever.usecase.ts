@@ -6,6 +6,10 @@ export class GetGrowdeverUseCase {
     public async execute(id: string) {
         const result = await this.repository.get(id);
 
-        return result?.toJson();
+        if (!result) {
+            return null;
+        }
+
+        return result.toJson();
     }
 }
