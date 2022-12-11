@@ -30,8 +30,6 @@ describe("Testes básicos", () => {
     });
 
     test("should test coverage", async () => {
-        jest.setTimeout(50000);
-
         const sut = new ListGrowdeversUseCase(
             new GrowdeverRepository(),
             new CacheRepository()
