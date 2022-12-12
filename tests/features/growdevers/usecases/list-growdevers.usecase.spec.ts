@@ -2,10 +2,7 @@ import { GrowdeverRepository } from "../../../../src/app/features/growdever/repo
 import { ListGrowdeversUseCase } from "../../../../src/app/features/growdever/usecases/list-growdevers.usecase";
 import { Growdever } from "../../../../src/app/models/growdever.model";
 import { CacheRepository } from "../../../../src/app/shared/database/repositories/cache.repository";
-import {
-    DatabaseConnection,
-    RedisConnection,
-} from "../../../../src/main/database";
+import { DatabaseConnection, RedisConnection } from "../../../../src/main/database";
 
 describe("List growdevers usecase unit tests", () => {
     beforeAll(async () => {
@@ -19,6 +16,13 @@ describe("List growdevers usecase unit tests", () => {
         return;
     });
 
+    beforeEach(() => {
+        jest.clearAllMocks();
+
+        const grow = new Growdever("BEFORE ALL TEST", 1999923, 12, []);
+        jest.spyOn(GrowdeverRepository.prototype, "list").mockResolvedValue([grow]);
+    });
+
     const makeSut = () => {
         const repository = new GrowdeverRepository();
         const cache = new CacheRepository();
@@ -29,15 +33,7 @@ describe("List growdevers usecase unit tests", () => {
 
     test("should return a valid list if there are more than 0 growdevers", async () => {
         const { sut } = makeSut();
-
-        const grow = new Growdever("abc", 123, 12, []);
-
-        jest.spyOn(GrowdeverRepository.prototype, "list").mockResolvedValueOnce(
-            [grow]
-        );
-        jest.spyOn(CacheRepository.prototype, "get").mockResolvedValueOnce(
-            null
-        );
+        jest.spyOn(CacheRepository.prototype, "get").mockResolvedValue(null);
 
         const result = await sut.execute();
         expect(result).toBeDefined();
@@ -49,12 +45,8 @@ describe("List growdevers usecase unit tests", () => {
 
         const grow = new Growdever("abc", 123, 12, []);
 
-        jest.spyOn(GrowdeverRepository.prototype, "list").mockResolvedValueOnce(
-            []
-        );
-        jest.spyOn(CacheRepository.prototype, "get").mockResolvedValueOnce(
-            null
-        );
+        jest.spyOn(GrowdeverRepository.prototype, "list").mockResolvedValue([]);
+        jest.spyOn(CacheRepository.prototype, "get").mockResolvedValue(null);
 
         const result = await sut.execute();
         expect(result).toBeDefined();

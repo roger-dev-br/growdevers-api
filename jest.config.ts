@@ -1,14 +1,18 @@
 export default {
+    // Configura o Jest para testes no Node.js
+    // usando Typescript.
     preset: "ts-jest",
     testEnvironment: "node",
-    roots: ["<rootDir>/tests"],
     transform: {
         ".+\\.ts$": "ts-jest",
     },
 
-    // Configurações de cobertura de código
+    // Informa em qual diretório os testes
+    // estarão contidos.
+    roots: ["<rootDir>/tests"],
+
+    // Configurações de cobertura de código.
     collectCoverageFrom: ["<rootDir>/src/app/**/*.ts"],
     coverageDirectory: "coverage",
     coveragePathIgnorePatterns: ["\\\\node_modules\\\\"],
-    clearMocks: true,
 };
