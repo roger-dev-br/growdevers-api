@@ -10,8 +10,10 @@
         "postinstall": "tsc",
         "build": "tsc",
         "typeorm": "typeorm-ts-node-commonjs",
-        "migration:generate": "npm run typeorm migration:generate -- -d ./src/database/config/config.ts",
-        "migration:run": "npm run typeorm migration:run -- -d src/database/config/config.ts",
+        "migration:generate": "npm run typeorm migration:generate -- -d ./src/main/config/database.config.ts",
+        "migration:generate:test": "rimraf tests/shared/migrations/*.ts && cross-env NODE_ENV=test npm run typeorm migration:generate -- -d ./src/main/config/database.config.ts tests/shared/migrations/TestMigration",
+        "migration:run": "npm run typeorm migration:run -- -d src/main/config/database.config.ts",
+        "migration:run:test": "cross-env NODE_ENV=test npm run typeorm migration:run -- -d src/main/config/database.config.ts",
         "migration:create": "npm run typeorm migration:create",
         "test": "jest --silent --noStackTrace --runInBand",
         "test:verbose": "jest --verbose --runInBand --detectOpenHandles",
@@ -20,7 +22,8 @@
         "test:unit": "jest -c jest.unit.config.ts --silent --noStackTrace --runInBand",
         "test:unit:verbose": "jest -c jest.unit.config.ts --verbose --runInBand --detectOpenHandles",
         "test:unit:coverage": "jest -c jest.unit.config.ts --silent --noStackTrace --runInBand --coverage",
-        "test:unit:watch": "jest -c jest.unit.config.ts --silent --noStackTrace --runInBand --watchAll"
+        "test:unit:watch": "jest -c jest.unit.config.ts --silent --noStackTrace --runInBand --watchAll",
+        "test:setup": "rimraf database.sqlite3 && npm run migration:generate:test && npm run migration:run:test"
     },
     "keywords": [],
     "author": "",
@@ -33,6 +36,9 @@
         "@types/pg": "^8.6.5",
         "@types/supertest": "^2.0.12",
         "@types/uuid": "^8.3.4",
+        "cross-env": "^7.0.3",
+        "rimraf": "^3.0.2",
+        "sqlite3": "^5.1.4",
         "ts-jest": "^29.0.3",
         "ts-node-dev": "^2.0.0",
         "typescript": "^4.8.3"
