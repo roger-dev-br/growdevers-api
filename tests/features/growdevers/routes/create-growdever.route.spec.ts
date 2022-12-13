@@ -141,14 +141,4 @@ describe("Testes para a rota de criação de um growdever na API", () => {
         expect(result.body.ok).toEqual(false);
         expect(result.body.message).toEqual(new Error("Test exception").toString());
     });
-
-    test("deve retornar 500 se body for null", async () => {
-        const result = await request(server).post("/growdever").send();
-
-        expect(result.statusCode).toBe(500);
-        expect(result.body).toHaveProperty("ok");
-        expect(result.body).toHaveProperty("message");
-        expect(result.body.ok).toEqual(false);
-        expect(result.body.message).toEqual(new Error("Test exception").toString());
-    });
 });
