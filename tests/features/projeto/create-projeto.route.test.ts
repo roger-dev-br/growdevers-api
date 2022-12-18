@@ -10,7 +10,12 @@ import request from "supertest";
 import { Request, Response, Router } from "express";
 
 class ProjetoController {
-    public async create(req: Request, res: Response) {}
+    public async create(req: Request, res: Response) {
+        return res.status(400).send({
+            ok: false,
+            message: "Nome não foi informado",
+        });
+    }
 }
 
 const projetoRoutes = () => {
@@ -29,7 +34,9 @@ describe("Testes da feature projeto usando TDD", () => {
         db = DatabaseConnection.connection.manager;
         app = createServer();
 
-        app.use("/projeto", projetoRoutes);
+        jest.setTimeout(15000);
+
+        app.use("/projeto", projetoRoutes());
     });
 
     afterAll(async () => {
@@ -73,7 +80,6 @@ describe("Testes da feature projeto usando TDD", () => {
             expect(result).toHaveProperty("body.message", message);
         }
     };
-    ("");
 
     test("deve retornar 400 se o nome do projeto não for informado", async () => {
         const body = {};
