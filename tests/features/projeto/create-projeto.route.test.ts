@@ -14,10 +14,11 @@ import { Request, Response, Router } from "express";
 import { Entity, EntityManager } from "typeorm";
 
 class Result {
-    public static ok(data: any) {
+    public static ok(data: any, code?: number) {
         return {
             ok: true,
             data,
+            code: code ?? 200,
         };
     }
 
@@ -41,6 +42,23 @@ class ProjetoRepository {
         return result.map((item) => this.mapEntityToModel(item));
     }
 
+    public async create(projeto: Projeto) {
+        const projetoEntity = this.repository.create({
+            id: projeto.id,
+            idGrowdever: projeto.growdever.id,
+            nome: projeto.nome,
+            indAtivo: projeto.indAtivo,
+        });
+
+        await this.repository.save(projetoEntity);
+
+        const result = await this.repository.findOneBy({
+            id: projeto.id,
+        });
+
+        return this.mapEntityToModel(result!);
+    }
+
     private mapEntityToModel(entity: ProjetoEntity) {
         const growdever = new GrowdeverRepository().mapEntityToModel(entity.growdever);
 
@@ -50,6 +68,7 @@ class ProjetoRepository {
 
 interface CreateProjetoDTO {
     idGrowdever: string;
+    nome: string;
 }
 
 class CreateProjetoUseCase {
@@ -66,7 +85,11 @@ class CreateProjetoUseCase {
             return Result.error("Growdever já possui 2 projetos", 400);
         }
 
-        throw new Error("Not implemented");
+        const projeto = new Projeto(data.nome, true, growdever);
+
+        const result = await this.repository.create(projeto);
+
+        return Result.ok(result.toJson());
     }
 }
 
@@ -91,13 +114,14 @@ class ProjetoController {
         const usecase = new CreateProjetoUseCase(new GrowdeverRepository(), new ProjetoRepository());
         const result = await usecase.execute({
             idGrowdever,
+            nome,
         });
 
         if (!result.ok) {
             return res.status(result.code).send(result);
         }
 
-        throw new Error("Not implemented");
+        return res.status(201).send(result);
     }
 }
 
@@ -180,6 +204,17 @@ describe("Testes da feature projeto usando TDD", () => {
         }
     };
 
+    const assertSuccess = (result: request.Response, code: number = 200, message?: string) => {
+        expect(result).toBeDefined();
+        expect(result).not.toBeNull();
+        expect(result).toHaveProperty("body.ok", true);
+        expect(result).toHaveProperty("statusCode", code);
+
+        if (message) {
+            expect(result).toHaveProperty("body.message", message);
+        }
+    };
+
     test("deve retornar 400 se o nome do projeto não for informado", async () => {
         const body = {};
 
@@ -222,5 +257,22 @@ describe("Testes da feature projeto usando TDD", () => {
         const result = await request(app).post("/projeto").send(body);
 
         assertErrorWithMessage(result, 400, "Growdever já possui 2 projetos");
+    });
+
+    test("deve retornar 201 se projeto for criado com sucesso", async () => {
+        const growdever = await createGrowdever();
+
+        const body = {
+            nome: "Teste",
+            idGrowdever: growdever.id,
+        };
+
+        const result = await request(app).post("/projeto").send(body);
+
+        assertSuccess(result, 201);
+
+        const projeto = result.body.data;
+        expect(projeto).toHaveProperty("nome", body.nome);
+        expect(projeto).toHaveProperty("growdever.id", growdever.id);
     });
 });

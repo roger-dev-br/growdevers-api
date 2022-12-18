@@ -42,4 +42,13 @@ export class Projeto {
 
         return project;
     }
+
+    public toJson() {
+        return {
+            id: this.id,
+            nome: this.nome,
+            indAtivo: this.indAtivo,
+            growdever: this.growdever.toJson(),
+        };
+    }
 }
