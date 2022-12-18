@@ -3,7 +3,7 @@ import { ListGrowdeversUseCase } from "../src/app/features/growdever/usecases/li
 import { CacheRepository } from "../src/app/shared/database/repositories/cache.repository";
 import { DatabaseConnection, RedisConnection } from "../src/main/database";
 
-describe("Testes básicos", () => {
+describe.skip("Testes básicos", () => {
     // test('should <...> if/when <...>', () => {
     //    ...
     // });
