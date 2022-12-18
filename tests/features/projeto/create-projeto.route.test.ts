@@ -11,10 +11,15 @@ import { Request, Response, Router } from "express";
 
 class ProjetoController {
     public async create(req: Request, res: Response) {
-        return res.status(400).send({
-            ok: false,
-            message: "Nome não foi informado",
-        });
+        const { nome } = req.body;
+        if (!nome) {
+            return res.status(400).send({
+                ok: false,
+                message: "Nome não foi informado",
+            });
+        }
+
+        throw new Error("Not implemented");
     }
 }
 
