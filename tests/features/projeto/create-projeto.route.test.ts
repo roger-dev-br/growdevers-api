@@ -1,3 +1,4 @@
+import { GrowdeverRepository } from "./../../../src/app/features/growdever/repositories/growdever.repository";
 import { GrowdeverEntity } from "./../../../src/app/shared/database/entities/growdever.entity";
 import { EnderecoEntity } from "./../../../src/app/shared/database/entities/endereco.entity";
 import { AvaliacaoEntity } from "./../../../src/app/shared/database/entities/avaliacao.entity";
@@ -9,9 +10,37 @@ import { Growdever } from "../../../src/app/models/growdever.model";
 import request from "supertest";
 import { Request, Response, Router } from "express";
 
+class Result {
+    public static ok(data: any) {
+        return {
+            ok: true,
+            data,
+        };
+    }
+
+    public static error(message: string, code?: number) {
+        return {
+            ok: false,
+            message,
+            code: code ?? 400,
+        };
+    }
+}
+
+interface CreateProjetoDTO {
+    idGrowdever: string;
+}
+
 class CreateProjetoUseCase {
-    public async execute() {
-        return null;
+    constructor(private growdeverRepository: GrowdeverRepository) {}
+
+    public async execute(data: CreateProjetoDTO) {
+        const growdever = await this.growdeverRepository.get(data.idGrowdever);
+        if (!growdever) {
+            return Result.error("Growdever não encontrado", 404);
+        }
+
+        throw new Error("Not implemented");
     }
 }
 
@@ -33,14 +62,13 @@ class ProjetoController {
             });
         }
 
-        const usecase = new CreateProjetoUseCase();
-        const result = await usecase.execute();
+        const usecase = new CreateProjetoUseCase(new GrowdeverRepository());
+        const result = await usecase.execute({
+            idGrowdever,
+        });
 
-        if (!result) {
-            return res.status(404).send({
-                ok: false,
-                message: "Growdever não encontrado",
-            });
+        if (!result.ok) {
+            return res.status(result.code).send(result);
         }
 
         throw new Error("Not implemented");
