@@ -7,6 +7,19 @@ import { createServer } from "./../../../src/main/config/server.config";
 import { DatabaseConnection, RedisConnection } from "../../../src/main/database";
 import { Growdever } from "../../../src/app/models/growdever.model";
 import request from "supertest";
+import { Request, Response, Router } from "express";
+
+class ProjetoController {
+    public async create(req: Request, res: Response) {}
+}
+
+const projetoRoutes = () => {
+    const router: Router = Router();
+
+    router.post("/", new ProjetoController().create);
+
+    return router;
+};
 
 describe("Testes da feature projeto usando TDD", () => {
     beforeAll(async () => {
@@ -16,7 +29,7 @@ describe("Testes da feature projeto usando TDD", () => {
         db = DatabaseConnection.connection.manager;
         app = createServer();
 
-        // app.use("/projeto", )
+        app.use("/projeto", projetoRoutes);
     });
 
     afterAll(async () => {
@@ -60,6 +73,7 @@ describe("Testes da feature projeto usando TDD", () => {
             expect(result).toHaveProperty("body.message", message);
         }
     };
+    ("");
 
     test("deve retornar 400 se o nome do projeto não for informado", async () => {
         const body = {};
