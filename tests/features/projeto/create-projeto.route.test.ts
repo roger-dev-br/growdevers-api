@@ -1,5 +1,7 @@
+import { Projeto } from "./../../../src/app/models/projeto.model";
 import { GrowdeverRepository } from "./../../../src/app/features/growdever/repositories/growdever.repository";
 import { GrowdeverEntity } from "./../../../src/app/shared/database/entities/growdever.entity";
+import { ProjetoEntity } from "./../../../src/app/shared/database/entities/projeto.entity";
 import { EnderecoEntity } from "./../../../src/app/shared/database/entities/endereco.entity";
 import { AvaliacaoEntity } from "./../../../src/app/shared/database/entities/avaliacao.entity";
 import { Endereco } from "./../../../src/app/models/endereco.model";
@@ -9,6 +11,7 @@ import { DatabaseConnection, RedisConnection } from "../../../src/main/database"
 import { Growdever } from "../../../src/app/models/growdever.model";
 import request from "supertest";
 import { Request, Response, Router } from "express";
+import { Entity, EntityManager } from "typeorm";
 
 class Result {
     public static ok(data: any) {
@@ -27,17 +30,40 @@ class Result {
     }
 }
 
+class ProjetoRepository {
+    private repository = DatabaseConnection.connection.getRepository(ProjetoEntity);
+
+    public async listByGrowdever(idGrowdever: string) {
+        const result = await this.repository.findBy({
+            idGrowdever,
+        });
+
+        return result.map((item) => this.mapEntityToModel(item));
+    }
+
+    private mapEntityToModel(entity: ProjetoEntity) {
+        const growdever = new GrowdeverRepository().mapEntityToModel(entity.growdever);
+
+        return Projeto.create(entity.id, entity.nome, entity.indAtivo, growdever);
+    }
+}
+
 interface CreateProjetoDTO {
     idGrowdever: string;
 }
 
 class CreateProjetoUseCase {
-    constructor(private growdeverRepository: GrowdeverRepository) {}
+    constructor(private growdeverRepository: GrowdeverRepository, private repository: ProjetoRepository) {}
 
     public async execute(data: CreateProjetoDTO) {
         const growdever = await this.growdeverRepository.get(data.idGrowdever);
         if (!growdever) {
             return Result.error("Growdever não encontrado", 404);
+        }
+
+        const projects = await this.repository.listByGrowdever(data.idGrowdever);
+        if (projects.length >= 2) {
+            return Result.error("Growdever já possui 2 projetos", 400);
         }
 
         throw new Error("Not implemented");
@@ -62,7 +88,7 @@ class ProjetoController {
             });
         }
 
-        const usecase = new CreateProjetoUseCase(new GrowdeverRepository());
+        const usecase = new CreateProjetoUseCase(new GrowdeverRepository(), new ProjetoRepository());
         const result = await usecase.execute({
             idGrowdever,
         });
@@ -103,28 +129,44 @@ describe("Testes da feature projeto usando TDD", () => {
 
     beforeEach(async () => {
         // Limpa os dados das tabelas abaixo
+        await db.clear(ProjetoEntity);
         await db.clear(AvaliacaoEntity);
         await db.clear(EnderecoEntity);
         await db.clear(GrowdeverEntity);
     });
 
     let app: any;
-    let db: any;
+    let db: EntityManager;
 
     const createGrowdever = async (growdever?: Growdever) => {
         growdever = growdever ?? new Growdever("teste", 12345, 20, ["nodejs"]);
 
-        const growdeverEntity = db.create(Growdever, {
+        const growdeverEntity = db.create(GrowdeverEntity, {
             id: growdever.id,
             cpf: growdever.cpf,
             idade: growdever.idade,
             nome: growdever.nome,
-            skills: growdever.skills,
+            skills: growdever.skills.join(","),
         });
 
         await db.save(growdeverEntity);
 
         return growdever;
+    };
+
+    const createProject = async (growdever: Growdever) => {
+        const project = new Projeto("teste", true, growdever);
+
+        const projectEntity = db.create(ProjetoEntity, {
+            idGrowdever: project.growdever.id,
+            id: project.id,
+            nome: project.nome,
+            indAtivo: project.indAtivo,
+        });
+
+        await db.save(projectEntity);
+
+        return project;
     };
 
     const assertErrorWithMessage = (result: request.Response, code: number = 400, message?: string) => {
@@ -165,5 +207,20 @@ describe("Testes da feature projeto usando TDD", () => {
         const result = await request(app).post("/projeto").send(body);
 
         assertErrorWithMessage(result, 404, "Growdever não encontrado");
+    });
+
+    test("deve retornar 400 se o growdever possuir 2 ou mais projetos", async () => {
+        const growdever = await createGrowdever();
+        await createProject(growdever);
+        await createProject(growdever);
+
+        const body = {
+            nome: "Teste",
+            idGrowdever: growdever.id,
+        };
+
+        const result = await request(app).post("/projeto").send(body);
+
+        assertErrorWithMessage(result, 400, "Growdever já possui 2 projetos");
     });
 });

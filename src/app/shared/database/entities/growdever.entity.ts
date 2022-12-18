@@ -1,11 +1,4 @@
-import {
-    Column,
-    Entity,
-    OneToMany,
-    PrimaryColumn,
-    OneToOne,
-    JoinColumn,
-} from "typeorm";
+import { Column, Entity, OneToMany, PrimaryColumn, OneToOne, JoinColumn } from "typeorm";
 import { AvaliacaoEntity } from "./avaliacao.entity";
 import { EnderecoEntity } from "./endereco.entity";
 
@@ -37,10 +30,11 @@ export class GrowdeverEntity {
 
     @OneToOne(() => EnderecoEntity, {
         eager: true,
+        nullable: true,
     })
     @JoinColumn({ name: "id_endereco" })
     endereco!: EnderecoEntity;
 
-    @Column({ name: "id_endereco" })
+    @Column({ name: "id_endereco", nullable: true })
     id_endereco!: number;
 }
