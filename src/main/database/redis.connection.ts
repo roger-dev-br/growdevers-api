@@ -25,11 +25,11 @@ export class RedisConnection {
         return this._connection;
     }
 
-    public static destroy() {
+    public static async destroy() {
         if (!this._connection) {
             throw new Error("Redis is not connected.");
         }
 
-        this._connection.disconnect();
+        await this._connection.quit();
     }
 }

@@ -1,7 +1,4 @@
-import {
-    DatabaseConnection,
-    RedisConnection,
-} from "../../../../src/main/database";
+import { DatabaseConnection, RedisConnection } from "../../../../src/main/database";
 import { GetGrowdeverUseCase } from "../../../../src/app/features/growdever/usecases/get-growdever.usecase";
 import { GrowdeverRepository } from "../../../../src/app/features/growdever/repositories/growdever.repository";
 import { Growdever } from "../../../../src/app/models/growdever.model";
@@ -13,7 +10,7 @@ describe("Get growdever usecase tests", () => {
     });
 
     afterAll(async () => {
-        RedisConnection.destroy();
+        await RedisConnection.destroy();
         await DatabaseConnection.destroy();
         return;
     });
@@ -24,9 +21,7 @@ describe("Get growdever usecase tests", () => {
     };
 
     test("should return null if growdever does not exist", async () => {
-        jest.spyOn(GrowdeverRepository.prototype, "get").mockResolvedValueOnce(
-            null
-        );
+        jest.spyOn(GrowdeverRepository.prototype, "get").mockResolvedValueOnce(null);
 
         const sut = makeSut();
         const result = await sut.execute("invalid-id");
@@ -37,9 +32,7 @@ describe("Get growdever usecase tests", () => {
     test("should return a valid json data if growdever exists", async () => {
         const grow = new Growdever("abc", 123, 12, []);
 
-        jest.spyOn(GrowdeverRepository.prototype, "get").mockResolvedValueOnce(
-            grow
-        );
+        jest.spyOn(GrowdeverRepository.prototype, "get").mockResolvedValueOnce(grow);
 
         const sut = makeSut();
         const result = await sut.execute("valid-id");

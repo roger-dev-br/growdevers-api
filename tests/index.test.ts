@@ -21,7 +21,7 @@ describe("Testes básicos", () => {
     });
 
     afterAll(async () => {
-        RedisConnection.destroy();
+        await RedisConnection.destroy();
         return await DatabaseConnection.destroy();
     });
 
@@ -30,10 +30,7 @@ describe("Testes básicos", () => {
     });
 
     test("should test coverage", async () => {
-        const sut = new ListGrowdeversUseCase(
-            new GrowdeverRepository(),
-            new CacheRepository()
-        );
+        const sut = new ListGrowdeversUseCase(new GrowdeverRepository(), new CacheRepository());
         const result = await sut.execute();
 
         expect(result).toBeDefined();

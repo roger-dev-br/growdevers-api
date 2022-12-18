@@ -3,3 +3,4 @@ build
 .env
 coverage
 *.sqlite3
+tests/shared/migrations/*
