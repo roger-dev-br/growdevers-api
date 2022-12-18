@@ -9,13 +9,37 @@ import { Growdever } from "../../../src/app/models/growdever.model";
 import request from "supertest";
 import { Request, Response, Router } from "express";
 
+class CreateProjetoUseCase {
+    public async execute() {
+        return null;
+    }
+}
+
 class ProjetoController {
     public async create(req: Request, res: Response) {
-        const { nome } = req.body;
+        const { nome, idGrowdever } = req.body;
+
         if (!nome) {
             return res.status(400).send({
                 ok: false,
                 message: "Nome não foi informado",
+            });
+        }
+
+        if (!idGrowdever) {
+            return res.status(400).send({
+                ok: false,
+                message: "Id do Growdever não foi informado",
+            });
+        }
+
+        const usecase = new CreateProjetoUseCase();
+        const result = await usecase.execute();
+
+        if (!result) {
+            return res.status(404).send({
+                ok: false,
+                message: "Growdever não encontrado",
             });
         }
 
@@ -90,8 +114,28 @@ describe("Testes da feature projeto usando TDD", () => {
         const body = {};
 
         const result = await request(app).post("/projeto").send(body);
-        console.log(result);
 
         assertErrorWithMessage(result, 400, "Nome não foi informado");
+    });
+
+    test("deve retornar 400 se o id do growdever do projeto não for informado", async () => {
+        const body = {
+            nome: "Teste",
+        };
+
+        const result = await request(app).post("/projeto").send(body);
+
+        assertErrorWithMessage(result, 400, "Id do Growdever não foi informado");
+    });
+
+    test("deve retornar 404 se o growdever não estiver cadastrado", async () => {
+        const body = {
+            nome: "Teste",
+            idGrowdever: "abc-123",
+        };
+
+        const result = await request(app).post("/projeto").send(body);
+
+        assertErrorWithMessage(result, 404, "Growdever não encontrado");
     });
 });
